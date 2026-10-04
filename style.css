@@ -1,0 +1,74 @@
+* { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+body { background-color: #f3e5f5; margin: 0; padding: 20px; text-align: center; }
+header { margin-bottom: 30px; }
+h1 { color: #6a1b9a; margin-bottom: 5px; }
+
+#btn-spin-all {
+    background-color: #4caf50; color: white; border: none;
+    padding: 12px 24px; font-size: 18px; border-radius: 30px;
+    cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: 0.3s; margin-top: 10px;
+}
+#btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
+
+/* Grid วงล้อ */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px; max-width: 1200px; margin: auto;
+}
+.wheel-card {
+    background: white; padding: 15px; border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.wheel-wrapper {
+    position: relative; width: 200px; height: 200px; margin: 0 auto 15px;
+}
+.wheel {
+    width: 100%; height: 100%; border-radius: 50%;
+    /* สร้างสีวงล้อจำลองด้วย CSS */
+    background: conic-gradient(#f44336 0 45deg, #2196f3 45deg 90deg, #ffeb3b 90deg 135deg, #4caf50 135deg 180deg, #ff9800 180deg 225deg, #9c27b0 225deg 270deg, #00bcd4 270deg 315deg, #e91e63 315deg 360deg);
+    border: 5px solid #333; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
+}
+/* ลูกศรชี้วงล้อ */
+.pointer {
+    position: absolute; top: 50%; right: -15px; transform: translateY(-50%);
+    width: 0; height: 0; border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent; border-right: 25px solid #d32f2f;
+    z-index: 10;
+}
+.btn-spin {
+    background-color: #6a1b9a; color: white; border: none; padding: 8px 15px;
+    border-radius: 20px; cursor: pointer; width: 100%; font-size: 16px;
+}
+.btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
+
+/* Grid สรุปผล */
+.summary-section { margin-top: 40px; background: white; padding: 20px; border-radius: 15px; }
+.grid-container-summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px; max-width: 1000px; margin: auto;
+}
+.summary-card {
+    background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd;
+}
+.summary-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;}
+
+/* Modal Popup */
+.modal {
+    display: none; position: fixed; z-index: 100; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+    justify-content: center; align-items: center;
+}
+.modal-content {
+    background-color: white; padding: 30px; border-radius: 20px;
+    text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: popIn 0.5s ease-out;
+}
+.modal-content img { width: 150px; height: 150px; border-radius: 10px; margin: 15px 0; object-fit: cover;}
+.btn-close {
+    background-color: #2196f3; color: white; border: none; padding: 10px 20px;
+    border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
+}
+
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
