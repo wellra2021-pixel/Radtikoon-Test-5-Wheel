@@ -1,7 +1,22 @@
 * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
-body { background-color: #f3e5f5; margin: 0; padding: 20px; text-align: center; }
+
+/* --- แก้ไขส่วน body เพื่อใส่รูปพื้นหลังโรงงาน --- */
+body { 
+    background-image: url('3_4.jpg'); /* ใช้รูปโรงงานเป็นพื้นหลัง */
+    background-size: cover;           /* ให้รูปขยายเต็มหน้าจอ */
+    background-position: center;      /* ให้อยู่กึ่งกลาง */
+    background-attachment: fixed;     /* พื้นหลังอยู่กับที่เวลาเลื่อนหน้าจอ */
+    background-repeat: no-repeat;
+    margin: 0; 
+    padding: 20px; 
+    text-align: center; 
+}
+
 header { margin-bottom: 30px; }
-h1 { color: #6a1b9a; margin-bottom: 5px; }
+
+/* เพิ่มเงาสีขาวให้ตัวหนังสืออ่านง่ายขึ้นเมื่ออยู่บนรูปพื้นหลัง */
+h1 { color: #6a1b9a; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.8); }
+p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
 #btn-spin-all {
     background-color: #4caf50; color: white; border: none;
@@ -16,9 +31,13 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px; max-width: 1100px; margin: auto;
 }
+
+/* --- ปรับให้การ์ดโปร่งแสง (สีขาวขุ่น) เพื่อให้เห็นพื้นหลังโรงงาน --- */
 .wheel-card {
-    background: white; padding: 15px; border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.85); /* สีขาวโปร่งแสง 85% */
+    backdrop-filter: blur(5px);            /* เบลอพื้นหลังด้านหลังการ์ดนิดหน่อย */
+    padding: 15px; border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .wheel-wrapper { 
@@ -48,24 +67,31 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 }
 .btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
 
-.summary-section { margin-top: 40px; background: white; padding: 20px; border-radius: 15px; }
+/* --- ปรับกรอบสรุปผลให้โปร่งแสงเช่นกัน --- */
+.summary-section { 
+    margin-top: 40px; 
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(5px);
+    padding: 20px; border-radius: 15px; 
+}
 
 /* --- ส่วนที่แก้ให้ 8 อันอยู่บรรทัดเดียวกัน --- */
 .grid-container-summary {
     display: grid; 
-    grid-template-columns: repeat(8, 1fr); /* บังคับให้แบ่งเป็น 8 ช่องเท่าๆ กัน */
+    grid-template-columns: repeat(8, 1fr); 
     gap: 10px; 
-    max-width: 100%; /* ให้ใช้พื้นที่กว้างสุดของหน้าจอ */
+    max-width: 100%; 
     margin: auto;
 }
 
 .summary-card { 
-    background: #fdfdfd; padding: 15px 5px; border-radius: 15px; 
+    background: rgba(253, 253, 253, 0.9); 
+    padding: 15px 5px; border-radius: 15px; 
     border: 1px solid #e1bee7; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .summary-card img { 
-    width: 80px; height: 80px; /* ลดขนาดรูปลงมานิดหน่อย เพื่อให้พอดีกับจอมากขึ้น */
+    width: 80px; height: 80px; 
     border-radius: 10px; 
     border: 3px solid #ffca28; 
     object-fit: cover; margin-bottom: 10px;
