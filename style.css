@@ -50,7 +50,7 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     border: 1px solid #e1bee7; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* สไตล์รูปสี่เหลี่ยมขอบมน มีกรอบสีเหลือง */
+/* สไตล์รูปในช่องสรุปผล */
 .summary-card img { 
     width: 90px; height: 90px; 
     border-radius: 10px; 
@@ -72,30 +72,38 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     animation: popIn 0.4s ease-out;
 }
-.modal-content img { width: 150px; height: 150px; border-radius: 10px; }
+
+/* รูปตอนสุ่มวงล้อได้ (ขนาด 150x150) */
+.modal-content img { width: 150px; height: 150px; border-radius: 10px; object-fit: cover; }
 .btn-close {
     background-color: #2196f3; color: white; border: none; padding: 10px 20px;
     border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
 }
 
-/* --- สไตล์หน้าต่างดูรูปขยายใหญ่ที่ปรับแก้ใหม่ --- */
+/* --- สไตล์หน้าต่างดูรูปขยายใหญ่ (แก้ไขความขัดแย้งของขนาดรูปแล้ว) --- */
 .viewer-card {
-    max-width: 800px; /* ขยายความกว้างการ์ดจาก 500px เป็น 800px */
-    width: 90%; /* เผื่อสำหรับหน้าจอมือถือ */
+    max-width: 650px; /* ความกว้างการ์ด */
+    width: 90%; 
     padding: 30px;
 }
-.viewer-img {
+
+/* ตั้งค่ารููปใหญ่ ให้มีขนาดสูงสุด 450px และปรับสัดส่วนอัตโนมัติ */
+.modal-content img.viewer-img {
     width: 100%; 
-    max-height: 75vh; /* ขยายความสูงของรูปภาพให้เต็มตาขึ้น */
+    max-width: 450px; 
+    height: auto;
+    max-height: 65vh; 
     object-fit: contain; 
     border-radius: 10px; 
-    margin-bottom: 20px; 
+    margin: 0 auto 20px auto; 
     border: 1px solid #ddd;
+    display: block;
 }
+
 #viewer-name {
     margin: 10px 0 20px 0; 
     color: #333; 
-    font-size: 26px; /* ขยายขนาดตัวหนังสือชื่อให้ใหญ่ขึ้นตามรูป */
+    font-size: 28px; 
     font-weight: bold;
 }
 .btn-close-viewer {
