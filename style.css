@@ -11,32 +11,43 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 }
 #btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
 
+/* ปรับระยะห่างของการ์ดให้พอดี ไม่ขยายใหญ่เกินไป */
 .grid-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px; max-width: 1200px; margin: auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px; max-width: 1100px; margin: auto;
 }
 .wheel-card {
     background: white; padding: 15px; border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-.wheel-wrapper { position: relative; width: 200px; height: 200px; margin: 0 auto 15px; }
+
+/* --- ปรับขนาดย่อวงล้อให้เล็กลงตรงนี้ --- */
+.wheel-wrapper { 
+    position: relative; 
+    width: 150px; /* ย่อจาก 200px เหลือ 150px */
+    height: 150px; /* ย่อจาก 200px เหลือ 150px */
+    margin: 0 auto 15px auto; 
+}
 .wheel {
     width: 100%; height: 100%; border-radius: 50%;
     background: conic-gradient(#f44336 0 45deg, #2196f3 45deg 90deg, #ffeb3b 90deg 135deg, #4caf50 135deg 180deg, #ff9800 180deg 225deg, #9c27b0 225deg 270deg, #00bcd4 270deg 315deg, #e91e63 315deg 360deg);
     border: 5px solid #333; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
 }
+
+/* ปรับขนาดลูกศรให้เล็กลงสมดุลกับวงล้อ */
 .pointer {
-    position: absolute; top: 50%; right: -15px; transform: translateY(-50%);
-    width: 0; height: 0; border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent; border-right: 25px solid #d32f2f;
+    position: absolute; top: 50%; right: -12px; transform: translateY(-50%);
+    width: 0; height: 0; border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent; border-right: 20px solid #d32f2f;
     z-index: 10;
 }
 
-.wheel-winner-name { margin: 10px 0; font-size: 18px; font-weight: bold; color: #888; min-height: 27px; }
+/* ปรับขนาดตัวหนังสือใต้วงล้อให้พอดี */
+.wheel-winner-name { margin: 10px 0; font-size: 16px; font-weight: bold; color: #888; min-height: 25px; }
 
 .btn-spin {
     background-color: #6a1b9a; color: white; border: none; padding: 8px 15px;
-    border-radius: 20px; cursor: pointer; width: 100%; font-size: 16px;
+    border-radius: 20px; cursor: pointer; width: 100%; font-size: 15px;
 }
 .btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
 
@@ -80,14 +91,12 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
 }
 
-/* --- สไตล์หน้าต่างดูรูปขยายใหญ่ (แก้ไขความขัดแย้งของขนาดรูปแล้ว) --- */
+/* สไตล์หน้าต่างดูรูปขยายใหญ่ */
 .viewer-card {
-    max-width: 650px; /* ความกว้างการ์ด */
+    max-width: 650px; 
     width: 90%; 
     padding: 30px;
 }
-
-/* ตั้งค่ารููปใหญ่ ให้มีขนาดสูงสุด 450px และปรับสัดส่วนอัตโนมัติ */
 .modal-content img.viewer-img {
     width: 100%; 
     max-width: 450px; 
@@ -99,7 +108,6 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     border: 1px solid #ddd;
     display: block;
 }
-
 #viewer-name {
     margin: 10px 0 20px 0; 
     color: #333; 
