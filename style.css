@@ -53,8 +53,8 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 /* สไตล์รูปสี่เหลี่ยมขอบมน มีกรอบสีเหลือง */
 .summary-card img { 
     width: 90px; height: 90px; 
-    border-radius: 10px; /* ขอบมน */
-    border: 3px solid #ffca28; /* ขอบสีเหลือง */
+    border-radius: 10px; 
+    border: 3px solid #ffca28; 
     object-fit: cover; margin-bottom: 10px;
     cursor: pointer; transition: 0.3s; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -78,21 +78,30 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
 }
 
-/* สไตล์หน้าต่างดูรูปขยายใหญ่ (ปุ่มสีม่วง) */
+/* --- สไตล์หน้าต่างดูรูปขยายใหญ่ที่ปรับแก้ใหม่ --- */
 .viewer-card {
-    max-width: 500px; padding: 20px;
+    max-width: 800px; /* ขยายความกว้างการ์ดจาก 500px เป็น 800px */
+    width: 90%; /* เผื่อสำหรับหน้าจอมือถือ */
+    padding: 30px;
 }
 .viewer-img {
-    width: 100%; max-height: 60vh; object-fit: contain; 
-    border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd;
+    width: 100%; 
+    max-height: 75vh; /* ขยายความสูงของรูปภาพให้เต็มตาขึ้น */
+    object-fit: contain; 
+    border-radius: 10px; 
+    margin-bottom: 20px; 
+    border: 1px solid #ddd;
 }
 #viewer-name {
-    margin: 10px 0; color: #333; font-size: 22px;
+    margin: 10px 0 20px 0; 
+    color: #333; 
+    font-size: 26px; /* ขยายขนาดตัวหนังสือชื่อให้ใหญ่ขึ้นตามรูป */
+    font-weight: bold;
 }
 .btn-close-viewer {
-    background-color: #8e24aa; /* ปุ่มสีม่วง */
-    color: white; border: none; padding: 10px 40px;
-    border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold;
+    background-color: #8e24aa; 
+    color: white; border: none; padding: 12px 50px;
+    border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold;
 }
 .btn-close-viewer:hover { background-color: #6a1b9a; }
 
