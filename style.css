@@ -11,7 +11,7 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 }
 #btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
 
-/* ปรับระยะห่างของการ์ดให้พอดี ไม่ขยายใหญ่เกินไป */
+/* กรอบวงล้อ */
 .grid-container {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px; max-width: 1100px; margin: auto;
@@ -21,11 +21,10 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* --- ปรับขนาดย่อวงล้อให้เล็กลงตรงนี้ --- */
 .wheel-wrapper { 
     position: relative; 
-    width: 150px; /* ย่อจาก 200px เหลือ 150px */
-    height: 150px; /* ย่อจาก 200px เหลือ 150px */
+    width: 150px; 
+    height: 150px; 
     margin: 0 auto 15px auto; 
 }
 .wheel {
@@ -34,7 +33,6 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     border: 5px solid #333; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
 }
 
-/* ปรับขนาดลูกศรให้เล็กลงสมดุลกับวงล้อ */
 .pointer {
     position: absolute; top: 50%; right: -12px; transform: translateY(-50%);
     width: 0; height: 0; border-top: 10px solid transparent;
@@ -42,7 +40,6 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     z-index: 10;
 }
 
-/* ปรับขนาดตัวหนังสือใต้วงล้อให้พอดี */
 .wheel-winner-name { margin: 10px 0; font-size: 16px; font-weight: bold; color: #888; min-height: 25px; }
 
 .btn-spin {
@@ -52,18 +49,23 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 .btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
 
 .summary-section { margin-top: 40px; background: white; padding: 20px; border-radius: 15px; }
+
+/* --- ส่วนที่แก้ให้ 8 อันอยู่บรรทัดเดียวกัน --- */
 .grid-container-summary {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 15px; max-width: 1100px; margin: auto;
+    display: grid; 
+    grid-template-columns: repeat(8, 1fr); /* บังคับให้แบ่งเป็น 8 ช่องเท่าๆ กัน */
+    gap: 10px; 
+    max-width: 100%; /* ให้ใช้พื้นที่กว้างสุดของหน้าจอ */
+    margin: auto;
 }
+
 .summary-card { 
-    background: #fdfdfd; padding: 15px 10px; border-radius: 15px; 
+    background: #fdfdfd; padding: 15px 5px; border-radius: 15px; 
     border: 1px solid #e1bee7; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* สไตล์รูปในช่องสรุปผล */
 .summary-card img { 
-    width: 90px; height: 90px; 
+    width: 80px; height: 80px; /* ลดขนาดรูปลงมานิดหน่อย เพื่อให้พอดีกับจอมากขึ้น */
     border-radius: 10px; 
     border: 3px solid #ffca28; 
     object-fit: cover; margin-bottom: 10px;
@@ -83,8 +85,6 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
     text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     animation: popIn 0.4s ease-out;
 }
-
-/* รูปตอนสุ่มวงล้อได้ (ขนาด 150x150) */
 .modal-content img { width: 150px; height: 150px; border-radius: 10px; object-fit: cover; }
 .btn-close {
     background-color: #2196f3; color: white; border: none; padding: 10px 20px;
