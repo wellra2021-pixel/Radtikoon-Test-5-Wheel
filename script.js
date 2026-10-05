@@ -2,7 +2,7 @@ let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
 
-// ลิงก์ CSV จาก Google Sheet 
+// ลิงก์ CSV จาก Google Sheet ของคุณ
 const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
 
 window.onload = async () => {
@@ -12,13 +12,12 @@ window.onload = async () => {
         parseCSV(csvText);
         
         if (participants.length === 0) {
-            alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด กรุณาตรวจสอบลิงก์ CSV อีกครั้ง');
+            alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด');
             return;
         }
         setupUI();
     } catch (error) {
-        console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error);
-        alert('ไม่สามารถดึงข้อมูลจาก Google Sheet ได้ กรุณาตรวจสอบลิงก์');
+        console.error('เกิดข้อผิดพลาด:', error);
     }
 };
 
@@ -49,7 +48,6 @@ function setupUI() {
     for (let i = 1; i <= totalWheels; i++) {
         wheelsState[i] = 0; 
 
-        // เพิ่ม <div id="wheel-winner-name-${i}"> สำหรับแสดงชื่อใต้วงล้อ
         wheelsContainer.innerHTML += `
             <div class="wheel-card">
                 <h3>วงล้อที่ ${i}</h3>
@@ -64,9 +62,10 @@ function setupUI() {
 
         summaryContainer.innerHTML += `
             <div class="summary-card" id="summary-${i}">
-                <h4 style="margin:5px 0; color:#666;">วงล้อที่ ${i}</h4>
-                <img id="summary-img-${i}" src="https://via.placeholder.com/80?text=?" alt="?" onclick="openImageViewer(this.src)">
-                <div id="summary-name-${i}">รอการสุ่ม...</div>
+                <h4 style="margin:5px 0 10px 0; color:#8e24aa;">วงล้อที่ ${i}</h4>
+                <!-- ส่งทั้งลิงก์รูป และ ชื่อผู้โชคดี ไปแสดงใน Popup -->
+                <img id="summary-img-${i}" src="https://via.placeholder.com/150?text=?" alt="?" onclick="openImageViewer(this.src, document.getElementById('summary-name-${i}').innerText)">
+                <div id="summary-name-${i}" style="font-weight:bold; color:#555;">รอการสุ่ม...</div>
             </div>
         `;
     }
@@ -77,7 +76,6 @@ function spinWheel(wheelIndex) {
     const btnElement = document.getElementById(`btn-spin-${wheelIndex}`);
     const winnerNameElement = document.getElementById(`wheel-winner-name-${wheelIndex}`);
     
-    // ตั้งค่าก่อนเริ่มหมุน
     btnElement.disabled = true; 
     winnerNameElement.innerText = "กำลังสุ่ม...";
     winnerNameElement.style.color = "#888";
@@ -91,15 +89,12 @@ function spinWheel(wheelIndex) {
         const winnerIndex = Math.floor(Math.random() * participants.length);
         const winner = participants[winnerIndex];
 
-        // 1. อัปเดตชื่อแสดงใต้วงล้อ
         winnerNameElement.innerText = "🎉 " + winner.name;
-        winnerNameElement.style.color = "#d32f2f"; // เปลี่ยนเป็นสีแดงเข้ม
+        winnerNameElement.style.color = "#d32f2f";
 
-        // 2. อัปเดตข้อมูลในส่วนสรุปผลด้านล่าง
         document.getElementById(`summary-img-${wheelIndex}`).src = winner.img;
         document.getElementById(`summary-name-${wheelIndex}`).innerText = winner.name;
-        document.getElementById(`summary-name-${wheelIndex}`).style.color = "#d32f2f";
-        document.getElementById(`summary-name-${wheelIndex}`).style.fontWeight = "bold";
+        document.getElementById(`summary-name-${wheelIndex}`).style.color = "#333";
 
         fireConfetti();
         showModal(wheelIndex, winner);
@@ -126,10 +121,13 @@ function closeModal() {
     document.getElementById('winner-modal').style.display = "none";
 }
 
-function openImageViewer(src) {
-    if (src.includes('via.placeholder.com/80?text=?')) return;
+// ฟังก์ชันเปิดดูรูปขยายใหญ่ (นำชื่อมาโชว์ใต้รูปด้วย)
+function openImageViewer(src, name) {
+    if (src.includes('via.placeholder.com')) return; // ถ้ารูปยังเป็นเครื่องหมายคำถาม จะไม่ให้กดดู
+    
     document.getElementById('full-image').src = src;
-    document.getElementById('image-viewer').style.display = "block";
+    document.getElementById('viewer-name').innerText = name;
+    document.getElementById('image-viewer').style.display = "flex";
 }
 
 function closeImageViewer() {
