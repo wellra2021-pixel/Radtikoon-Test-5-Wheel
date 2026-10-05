@@ -11,64 +11,89 @@ h1 { color: #6a1b9a; margin-bottom: 5px; }
 }
 #btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
 
-/* Grid วงล้อ */
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px; max-width: 1200px; margin: auto;
 }
 .wheel-card {
     background: white; padding: 15px; border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-.wheel-wrapper {
-    position: relative; width: 200px; height: 200px; margin: 0 auto 15px;
-}
+.wheel-wrapper { position: relative; width: 200px; height: 200px; margin: 0 auto 15px; }
 .wheel {
     width: 100%; height: 100%; border-radius: 50%;
-    /* สร้างสีวงล้อจำลองด้วย CSS */
     background: conic-gradient(#f44336 0 45deg, #2196f3 45deg 90deg, #ffeb3b 90deg 135deg, #4caf50 135deg 180deg, #ff9800 180deg 225deg, #9c27b0 225deg 270deg, #00bcd4 270deg 315deg, #e91e63 315deg 360deg);
     border: 5px solid #333; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
 }
-/* ลูกศรชี้วงล้อ */
 .pointer {
     position: absolute; top: 50%; right: -15px; transform: translateY(-50%);
     width: 0; height: 0; border-top: 15px solid transparent;
     border-bottom: 15px solid transparent; border-right: 25px solid #d32f2f;
     z-index: 10;
 }
+
+.wheel-winner-name { margin: 10px 0; font-size: 18px; font-weight: bold; color: #888; min-height: 27px; }
+
 .btn-spin {
     background-color: #6a1b9a; color: white; border: none; padding: 8px 15px;
     border-radius: 20px; cursor: pointer; width: 100%; font-size: 16px;
 }
 .btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
 
-/* Grid สรุปผล */
 .summary-section { margin-top: 40px; background: white; padding: 20px; border-radius: 15px; }
 .grid-container-summary {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px; max-width: 1000px; margin: auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px; max-width: 1100px; margin: auto;
 }
-.summary-card {
-    background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #ddd;
+.summary-card { 
+    background: #fdfdfd; padding: 15px 10px; border-radius: 15px; 
+    border: 1px solid #e1bee7; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-.summary-card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;}
 
-/* Modal Popup */
+/* สไตล์รูปสี่เหลี่ยมขอบมน มีกรอบสีเหลือง */
+.summary-card img { 
+    width: 90px; height: 90px; 
+    border-radius: 10px; /* ขอบมน */
+    border: 3px solid #ffca28; /* ขอบสีเหลือง */
+    object-fit: cover; margin-bottom: 10px;
+    cursor: pointer; transition: 0.3s; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.summary-card img:hover { transform: scale(1.05); }
+
+/* Popup ทั่วไป */
 .modal {
     display: none; position: fixed; z-index: 100; left: 0; top: 0;
-    width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
     justify-content: center; align-items: center;
 }
 .modal-content {
     background-color: white; padding: 30px; border-radius: 20px;
     text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    animation: popIn 0.5s ease-out;
+    animation: popIn 0.4s ease-out;
 }
-.modal-content img { width: 150px; height: 150px; border-radius: 10px; margin: 15px 0; object-fit: cover;}
+.modal-content img { width: 150px; height: 150px; border-radius: 10px; }
 .btn-close {
     background-color: #2196f3; color: white; border: none; padding: 10px 20px;
     border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
 }
+
+/* สไตล์หน้าต่างดูรูปขยายใหญ่ (ปุ่มสีม่วง) */
+.viewer-card {
+    max-width: 500px; padding: 20px;
+}
+.viewer-img {
+    width: 100%; max-height: 60vh; object-fit: contain; 
+    border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd;
+}
+#viewer-name {
+    margin: 10px 0; color: #333; font-size: 22px;
+}
+.btn-close-viewer {
+    background-color: #8e24aa; /* ปุ่มสีม่วง */
+    color: white; border: none; padding: 10px 40px;
+    border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold;
+}
+.btn-close-viewer:hover { background-color: #6a1b9a; }
 
 @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
