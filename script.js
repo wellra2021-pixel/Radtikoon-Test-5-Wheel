@@ -54,6 +54,8 @@ function setupUI() {
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
                     <div class="wheel" id="wheel-${i}"></div>
+                    <!-- เพิ่มรูปโลโก้ตรงนี้ -->
+                    <img src="Well2.jpg" class="wheel-center-logo" alt="Well Logo">
                 </div>
                 <div id="wheel-winner-name-${i}" class="wheel-winner-name">รอการสุ่ม...</div>
                 <button class="btn-spin" id="btn-spin-${i}" onclick="spinWheel(${i})">หมุนวงล้อที่ ${i}</button>
