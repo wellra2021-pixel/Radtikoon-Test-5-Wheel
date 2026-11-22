@@ -2,7 +2,7 @@ let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
 
-// ชุดสีสำหรับช่องวงล้อ (โทนสีสดใสตัดกับตัวอักษรขาว)
+// ชุดสีสำหรับช่องวงล้อ
 const sliceColors = [
     '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
     '#b8293d', '#24756d', '#d99b38', '#3c5296'
@@ -129,11 +129,11 @@ function drawWheel(canvasId) {
 
         // ตัดข้อความถ้ายาวเกินไปเพื่อไม่ให้ทับโลโก้ตรงกลาง
         let displayName = participants[i].name;
-        if (displayName.length > 16) {
-            displayName = displayName.substring(0, 15) + '..';
+        if (displayName.length > 15) {
+            displayName = displayName.substring(0, 14) + '..';
         }
 
-        ctx.fillText(displayName, radius - 22, 0);
+        ctx.fillText(displayName, radius - 18, 0);
         ctx.restore();
     }
 }
@@ -147,9 +147,8 @@ function spinWheel(wheelIndex) {
     winnerNameElement.innerText = "กำลังสุ่ม...";
     winnerNameElement.style.color = "#888";
 
-    // สุ่มองศาการหมุน
     const randomDegree = Math.floor(Math.random() * 360);
-    const extraSpins = 360 * 6; // หมุน 6 รอบ
+    const extraSpins = 360 * 6; 
     wheelsState[wheelIndex] += extraSpins + randomDegree;
     wheelElement.style.transform = `rotate(${wheelsState[wheelIndex]}deg)`;
 
@@ -174,7 +173,7 @@ function spinWheel(wheelIndex) {
         
         btnElement.disabled = false;
         btnElement.innerText = "หมุนใหม่";
-    }, 4500); // เวลาตรงกับ transition 4.5s ใน CSS
+    }, 4500);
 }
 
 function spinAll() {
