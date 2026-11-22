@@ -1,13 +1,6 @@
 let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
-let wheelTemplateCanvas = null;
-
-// ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
-const sliceColors = [
-    '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
-    '#b8293d', '#24756d', '#d99b38', '#3c5296'
-];
 
 // ลิงก์ CSV จาก Google Sheet ของคุณ
 const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
@@ -22,7 +15,6 @@ window.onload = async () => {
             alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด');
             return;
         }
-        buildWheelTemplate();
         setupUI();
     } catch (error) {
         console.error('เกิดข้อผิดพลาด:', error);
@@ -46,56 +38,6 @@ function parseCSV(csvText) {
     }
 }
 
-// สร้างแม่แบบวงล้อครั้งเดียวบน offscreen canvas เพื่อความคมชัดและรวดเร็ว
-function buildWheelTemplate() {
-    const size = 600;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-
-    const numSlices = participants.length;
-    const arcSize = (2 * Math.PI) / numSlices;
-    const centerX = size / 2;
-    const centerY = size / 2;
-    const radius = size / 2;
-
-    const sliceArcPx = radius * arcSize;
-    let fontSize = Math.floor(sliceArcPx * 0.65);
-    fontSize = Math.max(10, Math.min(24, fontSize));
-
-    for (let i = 0; i < numSlices; i++) {
-        const startAngle = i * arcSize;
-        const endAngle = startAngle + arcSize;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = sliceColors[i % sliceColors.length];
-        ctx.fill();
-
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.stroke();
-
-        ctx.clip();
-
-        ctx.translate(centerX, centerY);
-        ctx.rotate(startAngle + arcSize / 2);
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${fontSize}px "Sarabun", sans-serif`;
-
-        ctx.fillText(participants[i].name, radius - 18, 0);
-        ctx.restore();
-    }
-
-    wheelTemplateCanvas = canvas;
-}
-
 function setupUI() {
     const wheelsContainer = document.getElementById('wheels-container');
     const summaryContainer = document.getElementById('summary-container');
@@ -111,7 +53,7 @@ function setupUI() {
                 <h3>วงล้อที่ ${i}</h3>
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
-                    <canvas class="wheel-canvas" id="wheel-${i}" width="600" height="600"></canvas>
+                    <div class="wheel" id="wheel-${i}"></div>
                     <img src="Well2.jpg" alt="Well Logo" class="wheel-center-logo">
                 </div>
                 <div id="wheel-winner-name-${i}" class="wheel-winner-name">รอการสุ่ม...</div>
@@ -126,13 +68,6 @@ function setupUI() {
                 <div id="summary-name-${i}" style="font-weight:bold; color:#555;">รอการสุ่ม...</div>
             </div>
         `;
-
-        const targetCanvas = document.getElementById(`wheel-${i}`);
-        if (targetCanvas && wheelTemplateCanvas) {
-            const tctx = targetCanvas.getContext('2d');
-            tctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-            tctx.drawImage(wheelTemplateCanvas, 0, 0);
-        }
     }
 }
 
@@ -146,16 +81,12 @@ function spinWheel(wheelIndex) {
     winnerNameElement.style.color = "#888";
 
     const randomDegree = Math.floor(Math.random() * 360);
-    const extraSpins = 360 * 6; 
+    const extraSpins = 360 * 5; 
     wheelsState[wheelIndex] += extraSpins + randomDegree;
     wheelElement.style.transform = `rotate(${wheelsState[wheelIndex]}deg)`;
 
     setTimeout(() => {
-        const numSlices = participants.length;
-        const sliceDeg = 360 / numSlices;
-        const normalizedDeg = wheelsState[wheelIndex] % 360;
-        const pointerAngle = (360 - normalizedDeg) % 360;
-        const winnerIndex = Math.floor(pointerAngle / sliceDeg) % numSlices;
+        const winnerIndex = Math.floor(Math.random() * participants.length);
         const winner = participants[winnerIndex];
 
         winnerNameElement.innerText = "🎉 " + winner.name;
@@ -170,7 +101,7 @@ function spinWheel(wheelIndex) {
         
         btnElement.disabled = false;
         btnElement.innerText = "หมุนใหม่";
-    }, 4500);
+    }, 4000);
 }
 
 function spinAll() {
