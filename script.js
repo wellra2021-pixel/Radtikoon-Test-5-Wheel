@@ -3,6 +3,83 @@ const totalWheels = 8;
 const wheelsState = [];
 let wheelTemplateCanvas = null;
 
+// --- ระบบเสียงสังเคราะห์ผ่าน Web Audio API (ไม่ต้องโหลดไฟล์เสียงภายนอก) ---
+let audioCtx = null;
+function getAudioContext() {
+    if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+        }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+function playTickSound(pitch = 780) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(pitch, now);
+    osc.frequency.exponentialRampToValueAtTime(240, now + 0.045);
+
+    gain.gain.setValueAtTime(0.14, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+}
+
+function playSpinSoundForDuration(durationMs = 4500) {
+    const startTime = Date.now();
+    let step = 0;
+
+    function tickLoop() {
+        const elapsed = Date.now() - startTime;
+        if (elapsed >= durationMs) return;
+
+        // ค่อยๆ ชะลอจังหวะเสียงติ๊กตามการชะลอของวงล้อ
+        const progress = elapsed / durationMs;
+        const dynamicPitch = 920 - progress * 360 + (step % 2 === 0 ? 60 : -40);
+        playTickSound(dynamicPitch);
+
+        step++;
+        const nextDelay = Math.min(260, 55 + Math.pow(progress, 2.2) * 210);
+        setTimeout(tickLoop, nextDelay);
+    }
+
+    tickLoop();
+}
+
+function playWinSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+        const now = ctx.currentTime + idx * 0.11;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.36);
+    });
+}
+
 // ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
 const sliceColors = [
     '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
@@ -143,7 +220,7 @@ function setupUI() {
     }
 }
 
-function spinWheel(wheelIndex) {
+function spinWheel(wheelIndex, withSound = true) {
     const wheelElement = document.getElementById(`wheel-${wheelIndex}`);
     const btnElement = document.getElementById(`btn-spin-${wheelIndex}`);
     const winnerNameElement = document.getElementById(`wheel-winner-name-${wheelIndex}`);
@@ -151,6 +228,10 @@ function spinWheel(wheelIndex) {
     btnElement.disabled = true; 
     winnerNameElement.innerText = "กำลังสุ่ม...";
     winnerNameElement.style.color = "#888";
+
+    if (withSound) {
+        playSpinSoundForDuration(4500);
+    }
 
     const randomDegree = Math.floor(Math.random() * 360);
     const extraSpins = 360 * 6; 
@@ -172,6 +253,9 @@ function spinWheel(wheelIndex) {
         document.getElementById(`summary-name-${wheelIndex}`).innerText = winner.name;
         document.getElementById(`summary-name-${wheelIndex}`).style.color = "#333";
 
+        if (withSound) {
+            playWinSound();
+        }
         fireConfetti();
         showModal(wheelIndex, winner);
         
@@ -181,9 +265,13 @@ function spinWheel(wheelIndex) {
 }
 
 function spinAll() {
+    playSpinSoundForDuration(4700);
     for (let i = 1; i <= totalWheels; i++) {
-        setTimeout(() => { spinWheel(i); }, i * 200); 
+        setTimeout(() => { spinWheel(i, false); }, i * 200); 
     }
+    setTimeout(() => {
+        playWinSound();
+    }, 4500);
 }
 
 function showModal(wheelNum, winner) {
