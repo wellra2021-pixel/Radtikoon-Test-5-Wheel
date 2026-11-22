@@ -1,6 +1,6 @@
+style
 * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
 
-/* --- แก้ไขส่วน body เพื่อใส่รูปพื้นหลังโรงงาน --- */
 body { 
     background-image: url('3_4.jpg');
     background-size: cover;
@@ -25,13 +25,13 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 }
 #btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
 
-/* กรอบวงล้อ */
 .grid-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 20px; max-width: 1240px; margin: auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; max-width: 1200px; margin: auto;
 }
 
 .wheel-card {
+    position: relative;
     background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(5px);
     padding: 15px; border-radius: 15px;
@@ -41,14 +41,15 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
 .wheel-wrapper { 
     position: relative; 
-    width: 240px; 
-    height: 240px; 
+    width: 220px; 
+    height: 220px; 
     margin: 0 auto 15px auto; 
 }
 
 .wheel-clip {
-    width: 240px;
-    height: 240px;
+    position: relative;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     overflow: hidden;
     border: 5px solid #ffd54f;
@@ -57,18 +58,18 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
 .wheel-canvas {
     display: block;
-    width: 240px !important;
-    height: 240px !important;
-    max-width: 240px !important;
-    max-height: 240px !important;
+    width: 210px !important;
+    height: 210px !important;
+    max-width: 210px !important;
+    max-height: 210px !important;
     border-radius: 50%;
     transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1);
 }
 
 .pointer {
     position: absolute; top: 50%; right: -12px; transform: translateY(-50%);
-    width: 0; height: 0; border-top: 12px solid transparent;
-    border-bottom: 12px solid transparent; border-right: 22px solid #d32f2f;
+    width: 0; height: 0; border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent; border-right: 20px solid #d32f2f;
     filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.4));
     z-index: 10;
 }
@@ -78,10 +79,10 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 54px !important;
+    width: 52px !important;
     height: auto !important;
-    max-width: 54px !important;
-    max-height: 40px !important;
+    max-width: 52px !important;
+    max-height: 38px !important;
     object-fit: contain !important;
     background-color: #b71c1c;
     z-index: 5;
@@ -129,7 +130,6 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 }
 .summary-card img:hover { transform: scale(1.05); }
 
-/* Popup ทั่วไป */
 .modal {
     display: none; position: fixed; z-index: 100; left: 0; top: 0;
     width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
@@ -146,7 +146,6 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
     border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
 }
 
-/* สไตล์หน้าต่างดูรูปขยายใหญ่ */
 .viewer-card {
     max-width: 650px; 
     width: 90%; 
@@ -177,3 +176,46 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 .btn-close-viewer:hover { background-color: #6a1b9a; }
 
 @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+เฉพาะไฟล์ script.js: 
+
+
+script
+let participants = [];
+const totalWheels = 8;
+const wheelsState = [];
+let wheelTemplateCanvas = null;
+
+// ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
+const sliceColors = [
+    '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
+    '#b8293d', '#24756d', '#d99b38', '#3c5296'
+];
+
+// ลิงก์ CSV จาก Google Sheet ของคุณ
+const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
+
+window.onload = async () => {
+    try {
+        const response = await fetch(csvUrl);
+        const csvText = await response.text();
+        parseCSV(csvText);
+        
+        if (participants.length === 0) {
+            alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด');
+            return;
+        }
+        buildWheelTemplate();
+        setupUI();
+        renderAllWheels();
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาด:', error);
+    }
+};
+
+function parseCSV(csvText) {
+    const lines = csvText.split('\n');
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line === '') continue;
+        
+        const columns = line.split(',');
