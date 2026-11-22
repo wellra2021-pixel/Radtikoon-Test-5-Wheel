@@ -1,8 +1,9 @@
 let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
+let wheelTemplateCanvas = null;
 
-// ชุดสีสำหรับช่องวงล้อ
+// ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
 const sliceColors = [
     '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
     '#b8293d', '#24756d', '#d99b38', '#3c5296'
@@ -21,6 +22,7 @@ window.onload = async () => {
             alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด');
             return;
         }
+        buildWheelTemplate();
         setupUI();
     } catch (error) {
         console.error('เกิดข้อผิดพลาด:', error);
@@ -44,6 +46,58 @@ function parseCSV(csvText) {
     }
 }
 
+// สร้างแม่แบบวงล้อครั้งเดียวบน offscreen canvas เพื่อความคมชัดและรวดเร็ว
+function buildWheelTemplate() {
+    const size = 600;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    const numSlices = participants.length;
+    const arcSize = (2 * Math.PI) / numSlices;
+    const centerX = size / 2;
+    const centerY = size / 2;
+    const radius = size / 2;
+
+    // ปรับขนาดตัวอักษรตามจำนวนรายชื่อให้พอดีกับความกว้างของแต่ละช่อง
+    const sliceArcPx = radius * arcSize;
+    let fontSize = Math.floor(sliceArcPx * 0.65);
+    fontSize = Math.max(10, Math.min(24, fontSize));
+
+    for (let i = 0; i < numSlices; i++) {
+        const startAngle = i * arcSize;
+        const endAngle = startAngle + arcSize;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = sliceColors[i % sliceColors.length];
+        ctx.fill();
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.stroke();
+
+        // จำกัดพื้นที่วาดตัวอักษรให้อยู่เฉพาะในช่องนั้นๆ
+        ctx.clip();
+
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontSize}px "Sarabun", sans-serif`;
+
+        ctx.fillText(participants[i].name, radius - 18, 0);
+        ctx.restore();
+    }
+
+    wheelTemplateCanvas = canvas;
+}
+
 function setupUI() {
     const wheelsContainer = document.getElementById('wheels-container');
     const summaryContainer = document.getElementById('summary-container');
@@ -59,7 +113,7 @@ function setupUI() {
                 <h3>วงล้อที่ ${i}</h3>
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
-                    <canvas class="wheel-canvas" id="wheel-${i}" width="500" height="500"></canvas>
+                    <canvas class="wheel-canvas" id="wheel-${i}" width="600" height="600"></canvas>
                     <img src="Well2.jpg" alt="Well Logo" class="wheel-center-logo">
                 </div>
                 <div id="wheel-winner-name-${i}" class="wheel-winner-name">รอการสุ่ม...</div>
@@ -74,67 +128,13 @@ function setupUI() {
                 <div id="summary-name-${i}" style="font-weight:bold; color:#555;">รอการสุ่ม...</div>
             </div>
         `;
-    }
 
-    // วาดรายชื่อลงบน Canvas ของวงล้อทั้ง 8 วง
-    for (let i = 1; i <= totalWheels; i++) {
-        drawWheel(`wheel-${i}`);
-    }
-}
-
-// ฟังก์ชันวาดวงล้อพร้อมรายชื่อผู้เข้าร่วมทุกคน
-function drawWheel(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const numSlices = participants.length;
-    const arcSize = (2 * Math.PI) / numSlices;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = canvas.width / 2;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // ปรับขนาดฟอนต์อัตโนมัติตามจำนวนรายชื่อ
-    let fontSize = 22;
-    if (numSlices > 30) fontSize = 12;
-    else if (numSlices > 20) fontSize = 15;
-    else if (numSlices > 12) fontSize = 18;
-
-    for (let i = 0; i < numSlices; i++) {
-        const startAngle = i * arcSize;
-        const endAngle = startAngle + arcSize;
-
-        // 1. วาดสีพื้นหลังแต่ละช่อง
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = sliceColors[i % sliceColors.length];
-        ctx.fill();
-
-        // เส้นแบ่งช่องสีขาวบางๆ
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.stroke();
-
-        // 2. วาดรายชื่อตามแนวรัศมีของช่อง
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(startAngle + arcSize / 2);
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${fontSize}px Sarabun, sans-serif`;
-
-        // ตัดข้อความถ้ายาวเกินไปเพื่อไม่ให้ทับโลโก้ตรงกลาง
-        let displayName = participants[i].name;
-        if (displayName.length > 15) {
-            displayName = displayName.substring(0, 14) + '..';
+        const targetCanvas = document.getElementById(`wheel-${i}`);
+        if (targetCanvas && wheelTemplateCanvas) {
+            const tctx = targetCanvas.getContext('2d');
+            tctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+            tctx.drawImage(wheelTemplateCanvas, 0, 0);
         }
-
-        ctx.fillText(displayName, radius - 18, 0);
-        ctx.restore();
     }
 }
 
@@ -153,7 +153,6 @@ function spinWheel(wheelIndex) {
     wheelElement.style.transform = `rotate(${wheelsState[wheelIndex]}deg)`;
 
     setTimeout(() => {
-        // คำนวณรายชื่อผู้ชนะให้ตรงกับตำแหน่งเข็มชี้ (ด้านขวา = 0 องศา)
         const numSlices = participants.length;
         const sliceDeg = 360 / numSlices;
         const normalizedDeg = wheelsState[wheelIndex] % 360;
