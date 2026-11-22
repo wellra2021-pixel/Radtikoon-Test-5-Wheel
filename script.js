@@ -48,7 +48,7 @@ function parseCSV(csvText) {
 }
 
 function buildWheelTemplate() {
-    const size = 480;
+    const size = 344;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -61,8 +61,8 @@ function buildWheelTemplate() {
     const radius = size / 2;
 
     const sliceArcPx = radius * arcSize;
-    let fontSize = Math.floor(sliceArcPx * 0.65);
-    fontSize = Math.max(9, Math.min(20, fontSize));
+    let fontSize = Math.floor(sliceArcPx * 0.62);
+    fontSize = Math.max(8, Math.min(15, fontSize));
 
     for (let i = 0; i < numSlices; i++) {
         const startAngle = i * arcSize;
@@ -76,7 +76,7 @@ function buildWheelTemplate() {
         ctx.fillStyle = sliceColors[i % sliceColors.length];
         ctx.fill();
 
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.2;
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.stroke();
 
@@ -89,7 +89,7 @@ function buildWheelTemplate() {
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${fontSize}px "Sarabun", sans-serif`;
 
-        ctx.fillText(participants[i].name, radius - 14, 0);
+        ctx.fillText(participants[i].name, radius - 10, 0);
         ctx.restore();
     }
 
@@ -119,12 +119,12 @@ function setupUI() {
         wheelsState[i] = 0; 
 
         wheelsContainer.innerHTML += `
-            <div class="wheel-card">
+            <div class="wheel-card" style="overflow: hidden; position: relative;">
                 <h3>วงล้อที่ ${i}</h3>
-                <div class="wheel-wrapper">
+                <div class="wheel-wrapper" style="position: relative; width: 180px; height: 180px; margin: 0 auto 15px auto;">
                     <div class="pointer"></div>
-                    <div class="wheel-clip">
-                        <canvas class="wheel-canvas" id="wheel-${i}" width="480" height="480"></canvas>
+                    <div class="wheel-clip" style="position: relative; width: 180px; height: 180px; border-radius: 50%; overflow: hidden; border: 4px solid #ffd54f;">
+                        <canvas class="wheel-canvas" id="wheel-${i}" width="172" height="172" style="display: block; width: 172px; height: 172px; max-width: 172px; max-height: 172px; border-radius: 50%;"></canvas>
                     </div>
                     <img src="Well2.jpg" alt="Well Logo" class="wheel-center-logo">
                 </div>
