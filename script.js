@@ -1,7 +1,7 @@
 let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
-let wheelDataUrl = null;
+let wheelTemplateCanvas = null;
 
 // ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
 const sliceColors = [
@@ -47,9 +47,8 @@ function parseCSV(csvText) {
     }
 }
 
-// สร้างแม่แบบวงล้อครั้งเดียวและแปลงเป็น Data URL เพื่อวาดลงทุกวงล้อได้ครบถ้วนแน่นอน
 function buildWheelTemplate() {
-    const size = 600;
+    const size = 480;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -63,7 +62,7 @@ function buildWheelTemplate() {
 
     const sliceArcPx = radius * arcSize;
     let fontSize = Math.floor(sliceArcPx * 0.65);
-    fontSize = Math.max(10, Math.min(24, fontSize));
+    fontSize = Math.max(9, Math.min(20, fontSize));
 
     for (let i = 0; i < numSlices; i++) {
         const startAngle = i * arcSize;
@@ -77,7 +76,7 @@ function buildWheelTemplate() {
         ctx.fillStyle = sliceColors[i % sliceColors.length];
         ctx.fill();
 
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.stroke();
 
@@ -90,63 +89,22 @@ function buildWheelTemplate() {
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${fontSize}px "Sarabun", sans-serif`;
 
-        ctx.fillText(participants[i].name, radius - 18, 0);
+        ctx.fillText(participants[i].name, radius - 14, 0);
         ctx.restore();
     }
 
-    wheelDataUrl = canvas.toDataURL('image/png');
-}
-
-function drawSingleSliceWheel(canvas) {
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const size = canvas.width;
-    const numSlices = participants.length;
-    const arcSize = (2 * Math.PI) / numSlices;
-    const centerX = size / 2;
-    const centerY = size / 2;
-    const radius = size / 2;
-
-    const sliceArcPx = radius * arcSize;
-    let fontSize = Math.floor(sliceArcPx * 0.65);
-    fontSize = Math.max(10, Math.min(24, fontSize));
-
-    ctx.clearRect(0, 0, size, size);
-
-    for (let i = 0; i < numSlices; i++) {
-        const startAngle = i * arcSize;
-        const endAngle = startAngle + arcSize;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = sliceColors[i % sliceColors.length];
-        ctx.fill();
-
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.stroke();
-
-        ctx.clip();
-
-        ctx.translate(centerX, centerY);
-        ctx.rotate(startAngle + arcSize / 2);
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${fontSize}px "Sarabun", sans-serif`;
-
-        ctx.fillText(participants[i].name, radius - 18, 0);
-        ctx.restore();
-    }
+    wheelTemplateCanvas = canvas;
 }
 
 function renderAllWheels() {
+    if (!wheelTemplateCanvas) return;
     for (let i = 1; i <= totalWheels; i++) {
         const targetCanvas = document.getElementById(`wheel-${i}`);
-        drawSingleSliceWheel(targetCanvas);
+        if (targetCanvas) {
+            const tctx = targetCanvas.getContext('2d');
+            tctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+            tctx.drawImage(wheelTemplateCanvas, 0, 0, targetCanvas.width, targetCanvas.height);
+        }
     }
 }
 
@@ -165,7 +123,9 @@ function setupUI() {
                 <h3>วงล้อที่ ${i}</h3>
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
-                    <canvas class="wheel-canvas" id="wheel-${i}" width="600" height="600"></canvas>
+                    <div class="wheel-clip">
+                        <canvas class="wheel-canvas" id="wheel-${i}" width="480" height="480"></canvas>
+                    </div>
                     <img src="Well2.jpg" alt="Well Logo" class="wheel-center-logo">
                 </div>
                 <div id="wheel-winner-name-${i}" class="wheel-winner-name">รอการสุ่ม...</div>
