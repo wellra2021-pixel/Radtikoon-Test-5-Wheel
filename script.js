@@ -2,6 +2,12 @@ let participants = [];
 const totalWheels = 8;
 const wheelsState = [];
 
+// ชุดสีสำหรับช่องวงล้อ (โทนสีสดใสตัดกับตัวอักษรขาว)
+const sliceColors = [
+    '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
+    '#b8293d', '#24756d', '#d99b38', '#3c5296'
+];
+
 // ลิงก์ CSV จาก Google Sheet ของคุณ
 const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
 
@@ -53,9 +59,8 @@ function setupUI() {
                 <h3>วงล้อที่ ${i}</h3>
                 <div class="wheel-wrapper">
                     <div class="pointer"></div>
-                    <div class="wheel" id="wheel-${i}"></div>
-                    <!-- แทรกโลโก้ Well2.jpg ตรงกลางวงล้อแบบกำหนดขนาดในตัว (Inline Style) -->
-                    <img src="Well2.jpg" alt="Well Logo" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: auto; z-index: 5; border-radius: 4px; box-shadow: 0px 2px 4px rgba(0,0,0,0.5);">
+                    <canvas class="wheel-canvas" id="wheel-${i}" width="500" height="500"></canvas>
+                    <img src="Well2.jpg" alt="Well Logo" class="wheel-center-logo">
                 </div>
                 <div id="wheel-winner-name-${i}" class="wheel-winner-name">รอการสุ่ม...</div>
                 <button class="btn-spin" id="btn-spin-${i}" onclick="spinWheel(${i})">หมุนวงล้อที่ ${i}</button>
@@ -65,11 +70,71 @@ function setupUI() {
         summaryContainer.innerHTML += `
             <div class="summary-card" id="summary-${i}">
                 <h4 style="margin:5px 0 10px 0; color:#8e24aa;">วงล้อที่ ${i}</h4>
-                <!-- ส่งทั้งลิงก์รูป และ ชื่อผู้โชคดี ไปแสดงใน Popup -->
                 <img id="summary-img-${i}" src="https://via.placeholder.com/150?text=?" alt="?" onclick="openImageViewer(this.src, document.getElementById('summary-name-${i}').innerText)">
                 <div id="summary-name-${i}" style="font-weight:bold; color:#555;">รอการสุ่ม...</div>
             </div>
         `;
+    }
+
+    // วาดรายชื่อลงบน Canvas ของวงล้อทั้ง 8 วง
+    for (let i = 1; i <= totalWheels; i++) {
+        drawWheel(`wheel-${i}`);
+    }
+}
+
+// ฟังก์ชันวาดวงล้อพร้อมรายชื่อผู้เข้าร่วมทุกคน
+function drawWheel(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const numSlices = participants.length;
+    const arcSize = (2 * Math.PI) / numSlices;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = canvas.width / 2;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ปรับขนาดฟอนต์อัตโนมัติตามจำนวนรายชื่อ
+    let fontSize = 22;
+    if (numSlices > 30) fontSize = 12;
+    else if (numSlices > 20) fontSize = 15;
+    else if (numSlices > 12) fontSize = 18;
+
+    for (let i = 0; i < numSlices; i++) {
+        const startAngle = i * arcSize;
+        const endAngle = startAngle + arcSize;
+
+        // 1. วาดสีพื้นหลังแต่ละช่อง
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = sliceColors[i % sliceColors.length];
+        ctx.fill();
+
+        // เส้นแบ่งช่องสีขาวบางๆ
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.stroke();
+
+        // 2. วาดรายชื่อตามแนวรัศมีของช่อง
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontSize}px Sarabun, sans-serif`;
+
+        // ตัดข้อความถ้ายาวเกินไปเพื่อไม่ให้ทับโลโก้ตรงกลาง
+        let displayName = participants[i].name;
+        if (displayName.length > 16) {
+            displayName = displayName.substring(0, 15) + '..';
+        }
+
+        ctx.fillText(displayName, radius - 22, 0);
+        ctx.restore();
     }
 }
 
@@ -82,13 +147,19 @@ function spinWheel(wheelIndex) {
     winnerNameElement.innerText = "กำลังสุ่ม...";
     winnerNameElement.style.color = "#888";
 
+    // สุ่มองศาการหมุน
     const randomDegree = Math.floor(Math.random() * 360);
-    const extraSpins = 360 * 5; 
+    const extraSpins = 360 * 6; // หมุน 6 รอบ
     wheelsState[wheelIndex] += extraSpins + randomDegree;
     wheelElement.style.transform = `rotate(${wheelsState[wheelIndex]}deg)`;
 
     setTimeout(() => {
-        const winnerIndex = Math.floor(Math.random() * participants.length);
+        // คำนวณรายชื่อผู้ชนะให้ตรงกับตำแหน่งเข็มชี้ (ด้านขวา = 0 องศา)
+        const numSlices = participants.length;
+        const sliceDeg = 360 / numSlices;
+        const normalizedDeg = wheelsState[wheelIndex] % 360;
+        const pointerAngle = (360 - normalizedDeg) % 360;
+        const winnerIndex = Math.floor(pointerAngle / sliceDeg) % numSlices;
         const winner = participants[winnerIndex];
 
         winnerNameElement.innerText = "🎉 " + winner.name;
@@ -103,7 +174,7 @@ function spinWheel(wheelIndex) {
         
         btnElement.disabled = false;
         btnElement.innerText = "หมุนใหม่";
-    }, 4000);
+    }, 4500); // เวลาตรงกับ transition 4.5s ใน CSS
 }
 
 function spinAll() {
@@ -123,10 +194,8 @@ function closeModal() {
     document.getElementById('winner-modal').style.display = "none";
 }
 
-// ฟังก์ชันเปิดดูรูปขยายใหญ่ (นำชื่อมาโชว์ใต้รูปด้วย)
 function openImageViewer(src, name) {
-    if (src.includes('via.placeholder.com')) return; // ถ้ารูปยังเป็นเครื่องหมายคำถาม จะไม่ให้กดดู
-    
+    if (src.includes('via.placeholder.com')) return;
     document.getElementById('full-image').src = src;
     document.getElementById('viewer-name').innerText = name;
     document.getElementById('image-viewer').style.display = "flex";
