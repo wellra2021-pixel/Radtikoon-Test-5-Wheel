@@ -2,10 +2,10 @@
 
 /* --- แก้ไขส่วน body เพื่อใส่รูปพื้นหลังโรงงาน --- */
 body { 
-    background-image: url('3_4.jpg'); /* ใช้รูปโรงงานเป็นพื้นหลัง */
-    background-size: cover;           /* ให้รูปขยายเต็มหน้าจอ */
-    background-position: center;      /* ให้อยู่กึ่งกลาง */
-    background-attachment: fixed;     /* พื้นหลังอยู่กับที่เวลาเลื่อนหน้าจอ */
+    background-image: url('3_4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     background-repeat: no-repeat;
     margin: 0; 
     padding: 20px; 
@@ -14,7 +14,6 @@ body {
 
 header { margin-bottom: 30px; }
 
-/* เพิ่มเงาสีขาวให้ตัวหนังสืออ่านง่ายขึ้นเมื่ออยู่บนรูปพื้นหลัง */
 h1 { color: #6a1b9a; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.8); }
 p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
@@ -28,35 +27,67 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
 /* กรอบวงล้อ */
 .grid-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px; max-width: 1100px; margin: auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 20px; max-width: 1240px; margin: auto;
 }
 
-/* --- ปรับให้การ์ดโปร่งแสง (สีขาวขุ่น) เพื่อให้เห็นพื้นหลังโรงงาน --- */
 .wheel-card {
-    background: rgba(255, 255, 255, 0.85); /* สีขาวโปร่งแสง 85% */
-    backdrop-filter: blur(5px);            /* เบลอพื้นหลังด้านหลังการ์ดนิดหน่อย */
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(5px);
     padding: 15px; border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    overflow: hidden;
 }
 
 .wheel-wrapper { 
     position: relative; 
-    width: 150px; 
-    height: 150px; 
+    width: 240px; 
+    height: 240px; 
     margin: 0 auto 15px auto; 
 }
-.wheel {
-    width: 100%; height: 100%; border-radius: 50%;
-    background: conic-gradient(#f44336 0 45deg, #2196f3 45deg 90deg, #ffeb3b 90deg 135deg, #4caf50 135deg 180deg, #ff9800 180deg 225deg, #9c27b0 225deg 270deg, #00bcd4 270deg 315deg, #e91e63 315deg 360deg);
-    border: 5px solid #333; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
+
+.wheel-clip {
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid #ffd54f;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.wheel-canvas {
+    display: block;
+    width: 240px !important;
+    height: 240px !important;
+    max-width: 240px !important;
+    max-height: 240px !important;
+    border-radius: 50%;
+    transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1);
 }
 
 .pointer {
     position: absolute; top: 50%; right: -12px; transform: translateY(-50%);
-    width: 0; height: 0; border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent; border-right: 20px solid #d32f2f;
+    width: 0; height: 0; border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent; border-right: 22px solid #d32f2f;
+    filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.4));
     z-index: 10;
+}
+
+.wheel-center-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 54px !important;
+    height: auto !important;
+    max-width: 54px !important;
+    max-height: 40px !important;
+    object-fit: contain !important;
+    background-color: #b71c1c;
+    z-index: 5;
+    border-radius: 6px;
+    border: 2px solid #ffd54f;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 .wheel-winner-name { margin: 10px 0; font-size: 16px; font-weight: bold; color: #888; min-height: 25px; }
@@ -67,15 +98,13 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 }
 .btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
 
-/* --- ปรับกรอบสรุปผลให้โปร่งแสงเช่นกัน --- */
 .summary-section { 
     margin-top: 40px; 
-    background: rgba(255, 255, 255, 0.85); 
+    background: rgba(255, 255, 255, 0.88); 
     backdrop-filter: blur(5px);
     padding: 20px; border-radius: 15px; 
 }
 
-/* --- ส่วนที่แก้ให้ 8 อันอยู่บรรทัดเดียวกัน --- */
 .grid-container-summary {
     display: grid; 
     grid-template-columns: repeat(8, 1fr); 
@@ -148,16 +177,3 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 .btn-close-viewer:hover { background-color: #6a1b9a; }
 
 @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-/* --- สไตล์สำหรับโลโก้กลางวงล้อ --- */
-.wheel-center-logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 46px;
-    height: auto;
-    z-index: 5;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
