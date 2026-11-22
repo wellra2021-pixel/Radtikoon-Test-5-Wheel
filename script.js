@@ -60,7 +60,6 @@ function buildWheelTemplate() {
     const centerY = size / 2;
     const radius = size / 2;
 
-    // ปรับขนาดตัวอักษรตามจำนวนรายชื่อให้พอดีกับความกว้างของแต่ละช่อง
     const sliceArcPx = radius * arcSize;
     let fontSize = Math.floor(sliceArcPx * 0.65);
     fontSize = Math.max(10, Math.min(24, fontSize));
@@ -81,7 +80,6 @@ function buildWheelTemplate() {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.stroke();
 
-        // จำกัดพื้นที่วาดตัวอักษรให้อยู่เฉพาะในช่องนั้นๆ
         ctx.clip();
 
         ctx.translate(centerX, centerY);
