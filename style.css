@@ -1,3 +1,50 @@
+* { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+
+/* --- แก้ไขส่วน body เพื่อใส่รูปพื้นหลังโรงงาน --- */
+body { 
+    background-image: url('3_4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    margin: 0; 
+    padding: 20px; 
+    text-align: center; 
+}
+
+header { margin-bottom: 30px; }
+
+h1 { color: #6a1b9a; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.8); }
+p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
+
+#btn-spin-all {
+    background-color: #4caf50; color: white; border: none;
+    padding: 12px 24px; font-size: 18px; border-radius: 30px;
+    cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: 0.3s; margin-top: 10px;
+}
+#btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
+
+/* กรอบวงล้อ */
+.grid-container {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; max-width: 1200px; margin: auto;
+}
+
+.wheel-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(5px);
+    padding: 15px; border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.wheel-wrapper { 
+    position: relative; 
+    width: 240px; 
+    height: 240px; 
+    margin: 0 auto 15px auto; 
+}
+
 .wheel-canvas {
     display: block;
     width: 100%; 
@@ -8,6 +55,15 @@
     transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1);
 }
 
+.pointer {
+    position: absolute; top: 50%; right: -14px; transform: translateY(-50%);
+    width: 0; height: 0; border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent; border-right: 24px solid #d32f2f;
+    filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.4));
+    z-index: 10;
+}
+
+/* --- โลโก้ Well ตรงกลางวงล้อ แสดงเต็มโลโก้ไม่โดนตัดขอบ --- */
 .wheel-center-logo {
     position: absolute;
     top: 50%;
@@ -15,12 +71,100 @@
     transform: translate(-50%, -50%);
     width: 58px !important;
     height: auto !important;
-    max-width: 58px !important;
-    max-height: 44px !important;
-    object-fit: contain;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: fill !important;
     background-color: #b71c1c;
     z-index: 5;
     border-radius: 6px;
     border: 2px solid #ffd54f;
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
+
+.wheel-winner-name { margin: 10px 0; font-size: 16px; font-weight: bold; color: #888; min-height: 25px; }
+
+.btn-spin {
+    background-color: #6a1b9a; color: white; border: none; padding: 8px 15px;
+    border-radius: 20px; cursor: pointer; width: 100%; font-size: 15px;
+}
+.btn-spin:disabled { background-color: #ccc; cursor: not-allowed; }
+
+.summary-section { 
+    margin-top: 40px; 
+    background: rgba(255, 255, 255, 0.88); 
+    backdrop-filter: blur(5px);
+    padding: 20px; border-radius: 15px; 
+}
+
+.grid-container-summary {
+    display: grid; 
+    grid-template-columns: repeat(8, 1fr); 
+    gap: 10px; 
+    max-width: 100%; 
+    margin: auto;
+}
+
+.summary-card { 
+    background: rgba(253, 253, 253, 0.9); 
+    padding: 15px 5px; border-radius: 15px; 
+    border: 1px solid #e1bee7; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.summary-card img { 
+    width: 80px; height: 80px; 
+    border-radius: 10px; 
+    border: 3px solid #ffca28; 
+    object-fit: cover; margin-bottom: 10px;
+    cursor: pointer; transition: 0.3s; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.summary-card img:hover { transform: scale(1.05); }
+
+/* Popup ทั่วไป */
+.modal {
+    display: none; position: fixed; z-index: 100; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
+    justify-content: center; align-items: center;
+}
+.modal-content {
+    background-color: white; padding: 30px; border-radius: 20px;
+    text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: popIn 0.4s ease-out;
+}
+.modal-content img { width: 150px; height: 150px; border-radius: 10px; object-fit: cover; }
+.btn-close {
+    background-color: #2196f3; color: white; border: none; padding: 10px 20px;
+    border-radius: 20px; cursor: pointer; font-size: 16px; margin-top: 10px;
+}
+
+/* สไตล์หน้าต่างดูรูปขยายใหญ่ */
+.viewer-card {
+    max-width: 650px; 
+    width: 90%; 
+    padding: 30px;
+}
+.modal-content img.viewer-img {
+    width: 100%; 
+    max-width: 450px; 
+    height: auto;
+    max-height: 65vh; 
+    object-fit: contain; 
+    border-radius: 10px; 
+    margin: 0 auto 20px auto; 
+    border: 1px solid #ddd;
+    display: block;
+}
+#viewer-name {
+    margin: 10px 0 20px 0; 
+    color: #333; 
+    font-size: 28px; 
+    font-weight: bold;
+}
+.btn-close-viewer {
+    background-color: #8e24aa; 
+    color: white; border: none; padding: 12px 50px;
+    border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold;
+}
+.btn-close-viewer:hover { background-color: #6a1b9a; }
+
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
