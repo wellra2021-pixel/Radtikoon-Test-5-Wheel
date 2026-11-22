@@ -1,4 +1,3 @@
-style
 * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
 
 body { 
@@ -26,8 +25,8 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 #btn-spin-all:hover { background-color: #45a049; transform: scale(1.05); }
 
 .grid-container {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px; max-width: 1200px; margin: auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px; max-width: 1140px; margin: auto;
 }
 
 .wheel-card {
@@ -41,35 +40,35 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
 .wheel-wrapper { 
     position: relative; 
-    width: 220px; 
-    height: 220px; 
+    width: 180px; 
+    height: 180px; 
     margin: 0 auto 15px auto; 
 }
 
 .wheel-clip {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     overflow: hidden;
-    border: 5px solid #ffd54f;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border: 4px solid #ffd54f;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
 }
 
 .wheel-canvas {
     display: block;
-    width: 210px !important;
-    height: 210px !important;
-    max-width: 210px !important;
-    max-height: 210px !important;
+    width: 172px !important;
+    height: 172px !important;
+    max-width: 172px !important;
+    max-height: 172px !important;
     border-radius: 50%;
     transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1);
 }
 
 .pointer {
-    position: absolute; top: 50%; right: -12px; transform: translateY(-50%);
-    width: 0; height: 0; border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent; border-right: 20px solid #d32f2f;
+    position: absolute; top: 50%; right: -11px; transform: translateY(-50%);
+    width: 0; height: 0; border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent; border-right: 18px solid #d32f2f;
     filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.4));
     z-index: 10;
 }
@@ -79,16 +78,16 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 52px !important;
+    width: 46px !important;
     height: auto !important;
-    max-width: 52px !important;
-    max-height: 38px !important;
+    max-width: 46px !important;
+    max-height: 34px !important;
     object-fit: contain !important;
     background-color: #b71c1c;
     z-index: 5;
-    border-radius: 6px;
+    border-radius: 5px;
     border: 2px solid #ffd54f;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .wheel-winner-name { margin: 10px 0; font-size: 16px; font-weight: bold; color: #888; min-height: 25px; }
@@ -176,46 +175,3 @@ p { font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 .btn-close-viewer:hover { background-color: #6a1b9a; }
 
 @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-เฉพาะไฟล์ script.js: 
-
-
-script
-let participants = [];
-const totalWheels = 8;
-const wheelsState = [];
-let wheelTemplateCanvas = null;
-
-// ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
-const sliceColors = [
-    '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
-    '#b8293d', '#24756d', '#d99b38', '#3c5296'
-];
-
-// ลิงก์ CSV จาก Google Sheet ของคุณ
-const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
-
-window.onload = async () => {
-    try {
-        const response = await fetch(csvUrl);
-        const csvText = await response.text();
-        parseCSV(csvText);
-        
-        if (participants.length === 0) {
-            alert('ไม่พบรายชื่อใน Google Sheet หรือลิงก์ผิดพลาด');
-            return;
-        }
-        buildWheelTemplate();
-        setupUI();
-        renderAllWheels();
-    } catch (error) {
-        console.error('เกิดข้อผิดพลาด:', error);
-    }
-};
-
-function parseCSV(csvText) {
-    const lines = csvText.split('\n');
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === '') continue;
-        
-        const columns = line.split(',');
