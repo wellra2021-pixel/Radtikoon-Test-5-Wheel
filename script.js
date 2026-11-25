@@ -3,7 +3,10 @@ const totalWheels = 8;
 const wheelsState = [];
 let wheelTemplateCanvas = null;
 
-// --- ระบบเสียงสังเคราะห์ผ่าน Web Audio API (ไม่ต้องโหลดไฟล์เสียงภายนอก) ---
+// โฟลเดอร์ที่เก็บรูป (ปล่อยว่าง '' ถ้าวางรูปไว้โฟลเดอร์เดียวกับ index.html หรือใส่ 'images/' ถ้าแยกโฟลเดอร์)
+const IMAGE_FOLDER = '';
+
+// --- ระบบเสียงสังเคราะห์ผ่าน Web Audio API ---
 let audioCtx = null;
 function getAudioContext() {
     if (!audioCtx) {
@@ -45,7 +48,6 @@ function playSpinSoundForDuration(durationMs = 4500) {
         const elapsed = Date.now() - startTime;
         if (elapsed >= durationMs) return;
 
-        // ค่อยๆ ชะลอจังหวะเสียงติ๊กตามการชะลอของวงล้อ
         const progress = elapsed / durationMs;
         const dynamicPitch = 920 - progress * 360 + (step % 2 === 0 ? 60 : -40);
         playTickSound(dynamicPitch);
@@ -61,7 +63,7 @@ function playSpinSoundForDuration(durationMs = 4500) {
 function playWinSound() {
     const ctx = getAudioContext();
     if (!ctx) return;
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, idx) => {
         const now = ctx.currentTime + idx * 0.11;
         const osc = ctx.createOscillator();
@@ -80,13 +82,13 @@ function playWinSound() {
     });
 }
 
-// ชุดสีสำหรับช่องวงล้อ (โทนสีตัดกันชัดเจน อ่านตัวอักษรขาวง่าย)
+// ชุดสีสำหรับช่องวงล้อ
 const sliceColors = [
     '#9c1b31', '#1b5e58', '#c68b2c', '#2c3e75',
     '#b8293d', '#24756d', '#d99b38', '#3c5296'
 ];
 
-// ลิงก์ CSV จาก Google Sheet ของคุณ
+// ลิงก์ CSV จาก Google Sheet
 const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToP5SirNr1LvKDTzQOsDSErafGH06lQKDMsjPiDUC9Cq6zfQQAbD-SsRwn_16g71PsEEmK1uh9We2b/pub?output=csv';
 
 window.onload = async () => {
@@ -114,13 +116,35 @@ function parseCSV(csvText) {
         if (line === '') continue;
         
         const columns = line.split(',');
-        const name = columns[0] ? columns[0].trim() : "ไม่มีชื่อ";
-        let img = columns[1] ? columns[1].trim() : "";
+        const name = columns[0] ? columns[0].replace(/^"|"$/g, '').trim() : "ไม่มีชื่อ";
+        let img = columns[1] ? columns[1].replace(/^"|"$/g, '').trim() : "";
         
+        // ถ้าไม่ได้ใส่ลิงก์รูปในคอลัมน์ B ให้ดึงไฟล์รูปที่ชื่อตรงกับคอลัมน์ A ทันที
         if (!img) {
-            img = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=150`;
+            img = `${IMAGE_FOLDER}${name}.jpg`;
+        } else if (!img.startsWith('http') && !img.includes('.')) {
+            // กรณีพิมพ์ชื่อไฟล์ในคอลัมน์ B โดยไม่ใส่นามสกุล
+            img = `${IMAGE_FOLDER}${img}.jpg`;
         }
+
         participants.push({ name: name, img: img });
+    }
+}
+
+// ฟังก์ชันช่วยหาไฟล์รูปอัตโนมัติถ้าไม่ใช่ .jpg (ลอง .png -> .jpeg -> รูปตัวอักษรย่อ)
+function handleImgError(imgElement, name) {
+    const step = parseInt(imgElement.dataset.fallbackStep || '0', 10);
+    const baseName = `${IMAGE_FOLDER}${name}`;
+
+    if (step === 0) {
+        imgElement.dataset.fallbackStep = '1';
+        imgElement.src = `${baseName}.png`;
+    } else if (step === 1) {
+        imgElement.dataset.fallbackStep = '2';
+        imgElement.src = `${baseName}.jpeg`;
+    } else {
+        imgElement.onerror = null;
+        imgElement.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=300`;
     }
 }
 
@@ -213,7 +237,7 @@ function setupUI() {
         summaryContainer.innerHTML += `
             <div class="summary-card" id="summary-${i}">
                 <h4 style="margin:5px 0 10px 0; color:#8e24aa;">วงล้อที่ ${i}</h4>
-                <img id="summary-img-${i}" src="https://via.placeholder.com/150?text=?" alt="?" onclick="openImageViewer(this.src, document.getElementById('summary-name-${i}').innerText)">
+                <img id="summary-img-${i}" src="https://via.placeholder.com/150?text=?" alt="?" onclick="openImageViewer(this.currentSrc || this.src, document.getElementById('summary-name-${i}').innerText)">
                 <div id="summary-name-${i}" style="font-weight:bold; color:#555;">รอการสุ่ม...</div>
             </div>
         `;
@@ -249,7 +273,11 @@ function spinWheel(wheelIndex, withSound = true) {
         winnerNameElement.innerText = "🎉 " + winner.name;
         winnerNameElement.style.color = "#d32f2f";
 
-        document.getElementById(`summary-img-${wheelIndex}`).src = winner.img;
+        const summaryImg = document.getElementById(`summary-img-${wheelIndex}`);
+        summaryImg.dataset.fallbackStep = '0';
+        summaryImg.onerror = function() { handleImgError(this, winner.name); };
+        summaryImg.src = winner.img;
+
         document.getElementById(`summary-name-${wheelIndex}`).innerText = winner.name;
         document.getElementById(`summary-name-${wheelIndex}`).style.color = "#333";
 
@@ -276,7 +304,11 @@ function spinAll() {
 
 function showModal(wheelNum, winner) {
     document.getElementById('modal-wheel-num').innerText = wheelNum;
-    document.getElementById('modal-img').src = winner.img;
+    const modalImg = document.getElementById('modal-img');
+    modalImg.dataset.fallbackStep = '0';
+    modalImg.onerror = function() { handleImgError(this, winner.name); };
+    modalImg.src = winner.img;
+
     document.getElementById('modal-name').innerText = winner.name;
     document.getElementById('winner-modal').style.display = "flex";
 }
@@ -287,7 +319,11 @@ function closeModal() {
 
 function openImageViewer(src, name) {
     if (src.includes('via.placeholder.com')) return;
-    document.getElementById('full-image').src = src;
+    const fullImg = document.getElementById('full-image');
+    fullImg.dataset.fallbackStep = '0';
+    fullImg.onerror = function() { handleImgError(this, name); };
+    fullImg.src = src;
+
     document.getElementById('viewer-name').innerText = name;
     document.getElementById('image-viewer').style.display = "flex";
 }
